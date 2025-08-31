@@ -3,23 +3,30 @@
   "version": "1.0.0",
   "description": "",
   "main": "run.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "start": "node dist/src/run.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec ts-node src/run.ts"
+    "dev": "npx tsc -build && nodemon --exec ts-node dist/src/run.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/node": "^24.3.0",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.18.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
-    "nodemon": "^3.1.10",
-    "prisma": "^6.15.0"
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/mongoose": "^5.11.97",
+    "nodemon": "^3.1.10"
   }
 }
