@@ -6,10 +6,24 @@ import notesRoutes from "./routes/notesRoutes.js";
 import passport from "passport";
 import "./services/google-oauth.js"; // the strategy to be imported before routes to work properly
 import googleoauthRoutes from "./routes/googleoauthRoutes.js";
+import cors from "cors";
 dotenv.config();
 const app = express();
 // Middleware
 app.use(express.json());
+// enable cors & corsOptions
+const corsOptions = {
+    // origin:'http://localhost:8080',       // --> this request should be coming from frontend
+    origin: process.env.VITE_cLIENT_URL,
+    credentials: true, // as we are using cookie, credentials will be true.
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+// app.use(cors({
+//   origin: "http://localhost:5173",  // frontend origin
+//   credentials: true,                // allow cookies / auth headers
+// }));
+app.use(cors(corsOptions));
 // db connection
 connectDB();
 // Initialize passport middleware
