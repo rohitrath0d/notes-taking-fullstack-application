@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import {connectDB} from "./db/dbConnection.js";
+import { connectDB } from "./db/dbConnection.js";
 import authRoutes from "./routes/authRoutes.js";
 import notesRoutes from "./routes/notesRoutes.js";
 import passport from "passport";
@@ -34,6 +34,12 @@ app.use("/api/googleauth", googleoauthRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 5000;
+
+app.get("/", (_req, res) => {
+  res.send("Notes Taking web app Backend API is all up & running...");
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
