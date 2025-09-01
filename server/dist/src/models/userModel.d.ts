@@ -4,6 +4,7 @@ export interface User extends Document {
     email: string;
     password: string;
     googleId?: string;
+    provider: string;
     createdAt: Date;
     updatedAt: Date;
 }

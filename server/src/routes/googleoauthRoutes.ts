@@ -8,14 +8,14 @@ dotenv.config();
 const router = express.Router();
 
 
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get("/google", passport.authenticate("google", { scope: ["profile", "email"], session: false }));
 
 router.get(
   "/google/callback",
   passport.authenticate("google", { session: false }),
   (req, res) => {
     const user = req.user as any;
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!, { expiresIn: "1h" });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, { expiresIn: "1h" });
     // res.redirect(`http://your-frontend-url?token=${token}`);
     // Option 2: Send as secure HTTP-only cookie
     res.cookie("token", token, {
@@ -27,3 +27,5 @@ router.get(
     res.redirect("http://localhost:5173");
   }
 );
+
+export default router;

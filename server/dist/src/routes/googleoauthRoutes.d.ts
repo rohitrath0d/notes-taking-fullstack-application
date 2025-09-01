@@ -1,3 +1,3 @@
 declare const router: import("express-serve-static-core").Router;
 export default router;
-//# sourceMappingURL=google-oauthRoutes.d.ts.map
+//# sourceMappingURL=googleoauthRoutes.d.ts.map

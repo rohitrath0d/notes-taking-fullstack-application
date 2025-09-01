@@ -19,4 +19,4 @@ router.get("/google/callback", passport.authenticate("google", { session: false 
     res.redirect("http://localhost:5173");
 });
 export default router;
-//# sourceMappingURL=google-oauthRoutes.js.map
+//# sourceMappingURL=googleoauthRoutes.js.map

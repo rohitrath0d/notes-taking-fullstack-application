@@ -5,6 +5,7 @@ export interface User extends Document {
   email: string;
   password: string;
   googleId?: string;
+  provider: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -13,22 +14,26 @@ const userSchema = new Schema<User>(
   {
     name: {
       type: String,
-      required: true,
+      // required: true,
       trim: true,
     },
     email: {
       type: String,
-      required: true,
-      unique: true,
+      required: true, 
+      // unique: true,
       trim: true,
     },
     password: {
-      type: String,
-      required: true,
+      type: String,   // required only for local
+      // required: true,
     },
     googleId: {
-      type: String,
+      type: String,   // added for Google OAuth
       default: null,
+    },
+    provider: { 
+      type: String, 
+      default: "local" 
     },
   },
   {
