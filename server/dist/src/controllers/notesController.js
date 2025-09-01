@@ -45,6 +45,46 @@ export const getNotes = async (req, res) => {
         });
     }
 };
+// Update a note by ID
+export const updateNote = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, content } = req.body;
+        const userId = req.user?.id;
+        console.log("User ID from update note req.user:", userId);
+        if (!title && !content) {
+            return res.status(400).json({
+                success: false,
+                message: "At least one of title or content must be provided for update.",
+            });
+        }
+        const note = await Note.findOne({ _id: id, userId });
+        if (!note) {
+            return res.status(404).json({
+                success: false,
+                message: "Note not found or unauthorized.",
+            });
+        }
+        // Update fields if provided
+        if (title)
+            note.title = title;
+        if (content)
+            note.content = content;
+        const updatedNote = await note.save();
+        return res.status(200).json({
+            success: true,
+            message: "Note updated successfully.",
+            note: updatedNote,
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update note.",
+            error: error.message,
+        });
+    }
+};
 // Delete a note by ID
 export const deleteNote = async (req, res) => {
     try {

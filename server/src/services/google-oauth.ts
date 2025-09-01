@@ -11,20 +11,41 @@ passport.use(
     },
     async (_accessToken, _refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({
-          $or: [{ googleId: profile.id }, { email: profile.emails?.[0]?.value }]
-        });
+        // let user = await User.findOne({
+        //   $or: [{ googleId: profile.id }, { email: profile.emails?.[0]?.value }]
+        // });
 
-        if (!user) {
-          user = new User({
+        // if (!user) {
+        //   user = new User({
+        //     name: profile.displayName,
+        //     email: profile.emails?.[0]?.value ?? "",
+        //     googleId: profile.id,
+        //     provider: "google",
+        //   });
+        //   await user.save();
+        // }
+
+        const email = profile.emails?.[0]?.value ?? "";
+        let user = await User.findOne({ email });
+
+        if (user) {
+          // local account exists - Link Google account if not already linked
+          if (email && !user.googleId) {
+            user.googleId = profile.id;
+            // user.provider = "google";
+            user.provider = "both";
+            await user.save();
+          }
+        } else {
+          // No local account exists → create new
+          user = await User.create({
             name: profile.displayName,
-            email: profile.emails?.[0]?.value ?? "",
+            email,
             googleId: profile.id,
             provider: "google",
           });
-          await user.save();
         }
-
+        
         done(null, user);
       } catch (error: string | any) {
         // done(error, null);
