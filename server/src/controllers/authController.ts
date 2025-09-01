@@ -161,10 +161,10 @@ export const requestOtp = async (req: Request, res: Response) => {
       message: "OTP sent to email.",
       mode
     });
-  } catch (error: string | any ) {
+  } catch (error: string | any) {
     return res.status(500).json({
       success: false,
-      message: "Failed to send OTP.", 
+      message: "Failed to send OTP.",
       error: error.message
     });
   }
@@ -203,12 +203,25 @@ export const verifyOtpAndLoginAndSignup = async (req: Request, res: Response) =>
     if (user) {
       // Existing user → login
       const token = jwt.sign({ id: user._id }, JWT_SECRET!, { expiresIn: "1h" });
+      // remove OTP from store
       delete otpStore[email];
-      return res.status(200).json({ success: true, mode: "login", token, user });
+
+      // Exclude password from response
+      const { password, ...safeUser } = user.toObject();
+
+      return res.status(200).json({
+        success: true,
+        mode: "login",
+        token,
+        user: safeUser
+      });
     } else {
       // New user → need name + password for signup
       if (!name || !password) {
-        return res.status(400).json({ success: false, message: "Name and password are required for signup." });
+        return res.status(400).json({ 
+          success: false, 
+          message: "Name and password are required for signup." 
+        });
       }
 
       // OTP is valid, create the user
@@ -230,16 +243,26 @@ export const verifyOtpAndLoginAndSignup = async (req: Request, res: Response) =>
       // Remove OTP from store
       delete otpStore[email];
 
+      // Remove password from response
+      // const safeUser = savedUser.toObject() as any;      // any- This bypasses TypeScript’s strict checking.
+      // // safeUser.password = undefined; // or delete safeUser.password
+      // delete safeUser.password;
+
+      const { password: _, ...safeUser } = savedUser.toObject();
+
+
       return res.status(201).json({
         success: true,
-        token, user: savedUser
+        token,
+        // user: savedUser
+        user: safeUser
       });
     }
 
   } catch (error: any | string) {
     return res.status(500).json({
       success: false,
-      message: "Signup failed.", error: error.message
+      message: "Signup/Login failed.", error: error.message
     });
   }
 };

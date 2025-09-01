@@ -169,13 +169,24 @@ export const verifyOtpAndLoginAndSignup = async (req, res) => {
         if (user) {
             // Existing user → login
             const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1h" });
+            // remove OTP from store
             delete otpStore[email];
-            return res.status(200).json({ success: true, mode: "login", token, user });
+            // Exclude password from response
+            const { password, ...safeUser } = user.toObject();
+            return res.status(200).json({
+                success: true,
+                mode: "login",
+                token,
+                user: safeUser
+            });
         }
         else {
             // New user → need name + password for signup
             if (!name || !password) {
-                return res.status(400).json({ success: false, message: "Name and password are required for signup." });
+                return res.status(400).json({
+                    success: false,
+                    message: "Name and password are required for signup."
+                });
             }
             // OTP is valid, create the user
             const hashedPassword = await bcrypt.hash(password, 10);
@@ -191,16 +202,23 @@ export const verifyOtpAndLoginAndSignup = async (req, res) => {
             const token = jwt.sign({ id: savedUser._id }, JWT_SECRET, { expiresIn: "1h" });
             // Remove OTP from store
             delete otpStore[email];
+            // Remove password from response
+            // const safeUser = savedUser.toObject() as any;      // any- This bypasses TypeScript’s strict checking.
+            // // safeUser.password = undefined; // or delete safeUser.password
+            // delete safeUser.password;
+            const { password: _, ...safeUser } = savedUser.toObject();
             return res.status(201).json({
                 success: true,
-                token, user: savedUser
+                token,
+                // user: savedUser
+                user: safeUser
             });
         }
     }
     catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Signup failed.", error: error.message
+            message: "Signup/Login failed.", error: error.message
         });
     }
 };
