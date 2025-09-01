@@ -22,6 +22,9 @@ app.use("/api/notes", notesRoutes);
 app.use("/api/googleauth", googleoauthRoutes);
 // Start the server
 const PORT = process.env.PORT || 5000;
+app.get("/", (_req, res) => {
+    res.send("Notes Taking web app Backend API is all up & running...");
+});
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
