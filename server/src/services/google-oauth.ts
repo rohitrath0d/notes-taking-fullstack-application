@@ -1,0 +1,50 @@
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import User from "../models/userModel.js";
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      callbackURL: "/api/auth/google/callback",
+    },
+    async (_accessToken, _refreshToken, profile, done) => {
+      try {
+        let user = await User.findOne({ googleId: profile.id });
+
+        if (!user) {
+          user = new User({
+            name: profile.displayName,
+            email: profile.emails?.[0]?.value ?? "",
+            googleId: profile.id,
+          });
+          await user.save();
+        }
+
+        done(null, user);
+      } catch (error: string | any) {
+        // done(error, null);
+        done(error, undefined);
+      }
+    }
+  )
+);
+
+passport.serializeUser((user: any, done) => {
+  // done(null, user.id);
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return done(null, false); // not found
+    }
+    done(null, user);
+  } catch (error) {
+    // done(error, null);
+    done(error as any, undefined);
+  }
+});

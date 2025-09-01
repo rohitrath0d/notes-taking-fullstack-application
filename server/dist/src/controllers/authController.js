@@ -93,9 +93,9 @@ export const requestOtp = async (req, res) => {
             return res.status(400).json({ success: false, message: "Email is required." });
         }
         const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ success: false, message: "Email already registered." });
-        }
+        // if (existingUser) {
+        //   return res.status(400).json({ success: false, message: "Email already registered." });
+        // }
         // Generate OTP
         const otp = crypto.randomInt(100000, 999999).toString();
         console.log("Generated OTP:", otp);
@@ -125,15 +125,19 @@ export const requestOtp = async (req, res) => {
             text: `Your OTP code is ${otp}. It will expire in 5 minutes.`,
         });
         console.log("Domain info", info);
+        // Return response indicating login or signup mode
+        const mode = existingUser ? "login" : "signup";
         return res.status(200).json({
             success: true,
-            message: "OTP sent to email."
+            message: "OTP sent to email.",
+            mode
         });
     }
     catch (error) {
         return res.status(500).json({
             success: false,
-            message: "Failed to send OTP.", error: error.message
+            message: "Failed to send OTP.",
+            error: error.message
         });
     }
 };

@@ -6,7 +6,8 @@ export const createNote = async (req: Request, res: Response) => {
   try {
     const { title, content } = req.body;
     const userId = req.user?.id;        // Assuming `req.user` is populated by auth middleware
-
+    console.log("User ID from create note req.user:", userId);
+    
     if (!title || !content) {
       return res.status(400).json({ 
         message: "Title and content are required." 
@@ -34,6 +35,7 @@ export const createNote = async (req: Request, res: Response) => {
 export const getNotes = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
+    console.log("User ID from get note req.user:", userId)
 
     const notes = await Note.find({ userId });
     return res.status(200).json({
@@ -54,6 +56,7 @@ export const deleteNote = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
+    console.log("User ID from delete note req.user:", userId)
 
     const note = await Note.findOneAndDelete({ _id: id, userId });
 

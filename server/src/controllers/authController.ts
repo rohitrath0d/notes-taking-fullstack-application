@@ -116,9 +116,9 @@ export const requestOtp = async (req: Request, res: Response) => {
     }
 
     const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ success: false, message: "Email already registered." });
-    }
+    // if (existingUser) {
+    //   return res.status(400).json({ success: false, message: "Email already registered." });
+    // }
 
     // Generate OTP
     const otp = crypto.randomInt(100000, 999999).toString();
@@ -153,14 +153,19 @@ export const requestOtp = async (req: Request, res: Response) => {
     });
     console.log("Domain info", info)
 
-    return res.status(200).json({ 
-      success: true, 
-      message: "OTP sent to email." 
+    // Return response indicating login or signup mode
+    const mode = existingUser ? "login" : "signup";
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP sent to email.",
+      mode
     });
-  } catch (error: any) {
-    return res.status(500).json({ 
-      success: false, 
-      message: "Failed to send OTP.", error: error.message 
+  } catch (error: string | any ) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to send OTP.", 
+      error: error.message
     });
   }
 };
@@ -225,16 +230,16 @@ export const verifyOtpAndLoginAndSignup = async (req: Request, res: Response) =>
       // Remove OTP from store
       delete otpStore[email];
 
-      return res.status(201).json({ 
-        success: true, 
-        token, user: savedUser 
+      return res.status(201).json({
+        success: true,
+        token, user: savedUser
       });
     }
 
   } catch (error: any | string) {
-    return res.status(500).json({ 
-      success: false, 
-      message: "Signup failed.", error: error.message 
+    return res.status(500).json({
+      success: false,
+      message: "Signup failed.", error: error.message
     });
   }
 };

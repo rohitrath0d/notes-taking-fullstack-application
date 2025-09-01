@@ -60,6 +60,6 @@
     "downlevelIteration": true
 
   },
-  "include": ["src/**/*"],      // Include all `.ts` files in the `src` folder
+  "include": ["src/**/*", "types", "src/types/**/*"],      // Include all `.ts` files in the `src` folder
   "exclude": ["node_modules"]   // Exclude the `node_modules` folder
 }
