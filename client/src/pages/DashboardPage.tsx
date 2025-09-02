@@ -5,7 +5,8 @@ import { useForm } from "react-hook-form";
 import { Plus, Edit, Trash2, Menu, X, User, Mail, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import NotesAnimation from "../components/animations/NotesAnimation";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { API_BASE_URL } from "../lib/api";
 
 interface Note {
   _id: string;
@@ -22,6 +23,31 @@ interface UserData {
   provider: string;
 }
 
+// JWT Decoding Utility
+const decodeJWT = (token: string) => {
+  try {
+    const payload = token.split('.')[1];
+    const decodedPayload = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    return JSON.parse(decodedPayload);
+  } catch (error) {
+    console.error("Failed to decode JWT:", error);
+    return null;
+  }
+};
+
+const getUserFromToken = (token: string): UserData | null => {
+  const decoded = decodeJWT(token);
+  if (!decoded) return null;
+
+  return {
+    name: decoded.name || 'User',
+    email: decoded.email || 'user@example.com',
+    googleId: decoded.googleId,
+    provider: decoded.provider || 'local'
+  };
+};
+
+
 export default function Dashboard() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,6 +57,24 @@ export default function Dashboard() {
   const [user, setUser] = useState<UserData | null>(null);
   const { register, handleSubmit, reset, setValue } = useForm();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();           // for getting token from URL for enabling Google OAuth login/signup
+
+
+  // Check for token in URL parameters and store it
+  useEffect(() => {
+    const tokenFromURL = searchParams.get('token');
+    if (tokenFromURL) {
+      // Store the token from URL
+      localStorage.setItem("token", tokenFromURL);
+
+      // Clean up the URL - remove the token parameter
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+
+      toast.success("Successfully logged in!");
+    }
+  }, [searchParams]);
+
 
   // Check authentication and fetch user data
   useEffect(() => {
@@ -42,6 +86,14 @@ export default function Dashboard() {
       return;
     }
 
+    // Extract user data from token first (faster, no API call needed)
+    const userDataFromToken = getUserFromToken(token);
+    if (userDataFromToken) {
+      setUser(userDataFromToken);
+    }
+
+
+    // Then fetch detailed user data from API
     // Fetch user data from token (in a real app, you'd decode JWT or call an API)
     // const fetchUserFromToken = async () => {
     const fetchUserData = async () => {
@@ -56,7 +108,8 @@ export default function Dashboard() {
         // setUser(userData);
 
         const token = localStorage.getItem("token");
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
+        // const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
+        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
           headers: {
             "Authorization": `Bearer ${token}`,
           },
@@ -67,7 +120,7 @@ export default function Dashboard() {
         } else if (response.status === 401) {
           localStorage.removeItem("token");
           toast.error("Session expired. Please login again.");
-          navigate("/login");
+          navigate("/");
         } else {
           throw new Error("Failed to fetch user data");
         }
@@ -87,7 +140,8 @@ export default function Dashboard() {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/get`, {
+      // const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/get`, {
+      const response = await fetch(`${API_BASE_URL}/api/notes/get`, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
@@ -481,10 +535,21 @@ function SidebarContent({ user, isCollapsed, onClose, onLogout, onConnectGoogle,
         {!isCollapsed && user && (
           <div className="mt-4 p-3 bg-gray-50 rounded-lg">
             <h3 className="text-sm font-medium mb-2">Account Status</h3>
-            <div className="flex items-center justify-between text-sm mb-2">
+
+            {/* Error here, showed connected google account, even when not connected */}
+            {/* <div className="flex items-center justify-between text-sm mb-2">
               <span className="text-gray-600">Local Account</span>
               <span className="text-green-500 font-medium">Connected</span>
-            </div>
+            </div> */}
+            
+            {/* Show local account status only if user has local account */}
+            {(user.provider === 'local' || user.provider === 'both') && (
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="text-gray-600">Local Account</span>
+                <span className="text-green-500 font-medium">Connected</span>
+              </div>
+            )}
+
             {!user.googleId ? (
               <button
                 onClick={onConnectGoogle}
@@ -525,7 +590,7 @@ function SidebarContent({ user, isCollapsed, onClose, onLogout, onConnectGoogle,
       <div className="p-4 border-t border-gray-200">
         <button
           onClick={onLogout}
-          className={`flex items-center gap-2 w-full rounded-md p-2 text-white bg-blue-600 rounded ${isCollapsed ? 'justify-center' : ''}`}
+          className={`flex items-center gap-2 w-full rounded-md p-2 text-white bg-blue-600  ${isCollapsed ? 'justify-center' : ''}`}
         >
           <LogOut
             className="h-4 w-4"
