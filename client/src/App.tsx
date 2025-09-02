@@ -1,4 +1,9 @@
-import AppRoutes from "./routes/AppRoutes"
+import { Toaster } from "sonner"
+// react-router-dom setup
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+// import SignupPage from "./pages/SignUpPage";
+// import LoginPage from "./pages/UnifiedLoginAndSignInPage";
+import UnifiedLoginAndSignInPage from "./pages/UnifiedLoginAndSignInPage";
 
 
 function App() {
@@ -6,10 +11,21 @@ function App() {
   return (
     <>
 
-    {/* <div className="text-center text-3xl font-bold text-amber-500 p-40"> Hello from vite frontend!!</div> */}
+      {/* <div className="text-center text-3xl font-bold text-amber-500 p-40"> Hello from vite frontend!!</div> */}
 
-    <AppRoutes/>
-     
+      <Toaster />
+      {/* react touter dom setup */}
+      <BrowserRouter>
+        <Routes>
+          {/* <Route path="/" element={<Navigate to="/signup" />} /> */}
+          {/* <Route path="/signup" element={<SignupPage />} /> */}
+          {/* <Route path="/login" element={<LoginPage />} /> */}
+          <Route path="/" element={<Navigate to="/signup-or-login" />} />
+          <Route path="/signup-or-login" element={<UnifiedLoginAndSignInPage />} />
+          {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
+        </Routes>
+      </BrowserRouter>
+
     </>
   )
 }

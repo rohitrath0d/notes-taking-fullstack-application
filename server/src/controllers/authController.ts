@@ -170,44 +170,176 @@ export const requestOtp = async (req: Request, res: Response) => {
   }
 };
 
-// Verify OTP and Complete Signup
-export const verifyOtpAndLoginAndSignup = async (req: Request, res: Response) => {
-  try {
-    const { email, otp, name, password } = req.body;
+// // Verify OTP and Complete Signup
+// export const verifyOtpAndLoginAndSignup = async (req: Request, res: Response) => {
+//   try {
+//     const { email, otp, name, password } = req.body;
 
-    if (!email || !otp || !name || !password) {
+//     if (!email || !otp || !name || !password) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "All fields are required."
+//       });
+//     }
+
+//     const storedOtp = otpStore[email];
+//     if (!storedOtp || storedOtp.otp !== otp || storedOtp.expiresAt < Date.now()) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid or expired OTP."
+//       });
+//     }
+
+//     // if (storedOtp.expiresAt < Date.now()) {
+//     //   return res.status(400).json({ 
+//     //     success: false, 
+//     //     message: "OTP has expired." 
+//     //   });
+//     // }
+
+//     // OTP is valid → check if user exists
+//     let user = await User.findOne({ email });     // User from mongodb model
+
+//     if (user) {
+//       // Existing user → login
+//       const token = jwt.sign({ id: user._id }, JWT_SECRET!, { expiresIn: "1h" });
+//       // remove OTP from store
+//       delete otpStore[email];
+
+//       // Exclude password from response
+//       const { password, ...safeUser } = user.toObject();
+
+//       return res.status(200).json({
+//         success: true,
+//         mode: "login",
+//         token,
+//         user: safeUser
+//       });
+//     } else {
+//       // New user → need name + password for signup
+//       if (!name || !password) {
+//         return res.status(400).json({ 
+//           success: false, 
+//           message: "Name and password are required for signup." 
+//         });
+//       }
+
+//       // OTP is valid, create the user
+//       const hashedPassword = await bcrypt.hash(password, 10);
+
+//       // const newUser = new User({
+//       user = new User({                 // fetching the user from the let variable
+//         name,
+//         email,
+//         password: hashedPassword,
+//       });
+
+//       // const savedUser = await newUser.save();
+//       const savedUser = await user.save();
+
+//       // Generate JWT token
+//       const token = jwt.sign({ id: savedUser._id }, JWT_SECRET!, { expiresIn: "1h" });
+
+//       // Remove OTP from store
+//       delete otpStore[email];
+
+//       // Remove password from response
+//       // const safeUser = savedUser.toObject() as any;      // any- This bypasses TypeScript’s strict checking.
+//       // // safeUser.password = undefined; // or delete safeUser.password
+//       // delete safeUser.password;
+
+//       const { password: _, ...safeUser } = savedUser.toObject();
+
+
+//       return res.status(201).json({
+//         success: true,
+//         token,
+//         // user: savedUser
+//         user: safeUser
+//       });
+//     }
+
+//   } catch (error: any | string) {
+//     return res.status(500).json({
+//       success: false,
+//       message: "Signup/Login failed.", error: error.message
+//     });
+//   }
+// };
+
+// Verify OTP (just verification, no login/signup yet)
+export const verifyOtp = async (req: Request, res: Response) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required."
+        message: "Email and OTP are required."
       });
     }
 
     const storedOtp = otpStore[email];
-    if (!storedOtp || storedOtp.otp !== otp || storedOtp.expiresAt < Date.now()) {
+    if (!storedOtp || storedOtp.otp !== otp) {
       return res.status(400).json({
         success: false,
-        message: "Invalid or expired OTP."
+        message: "Invalid OTP."
       });
     }
 
-    // if (storedOtp.expiresAt < Date.now()) {
-    //   return res.status(400).json({ 
-    //     success: false, 
-    //     message: "OTP has expired." 
-    //   });
-    // }
+    if (storedOtp.expiresAt < Date.now()) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "OTP has expired." 
+      });
+    }
 
-    // OTP is valid → check if user exists
-    let user = await User.findOne({ email });     // User from mongodb model
+    // Check if user exists
+    const user = await User.findOne({ email });
+    const mode = user ? "login" : "signup";
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP verified successfully.",
+      mode
+    });
+
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: "OTP verification failed.", 
+      error: error.message
+    });
+  }
+};
+
+// Complete signup or login after OTP verification
+export const completeSignupOrLogin = async (req: Request, res: Response) => {
+  try {
+    const { email, name, password } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required."
+      });
+    }
+
+    // Check if user exists
+    let user = await User.findOne({ email });
 
     if (user) {
-      // Existing user → login
-      const token = jwt.sign({ id: user._id }, JWT_SECRET!, { expiresIn: "1h" });
-      // remove OTP from store
-      delete otpStore[email];
+      // Existing user - login
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid credentials."
+        });
+      }
 
-      // Exclude password from response
-      const { password, ...safeUser } = user.toObject();
+      const token = jwt.sign({ id: user._id }, JWT_SECRET!, { expiresIn: "1h" });
+      const { password: _, ...safeUser } = user.toObject();
 
       return res.status(200).json({
         success: true,
@@ -216,7 +348,7 @@ export const verifyOtpAndLoginAndSignup = async (req: Request, res: Response) =>
         user: safeUser
       });
     } else {
-      // New user → need name + password for signup
+      // New user - signup
       if (!name || !password) {
         return res.status(400).json({ 
           success: false, 
@@ -224,45 +356,32 @@ export const verifyOtpAndLoginAndSignup = async (req: Request, res: Response) =>
         });
       }
 
-      // OTP is valid, create the user
       const hashedPassword = await bcrypt.hash(password, 10);
-
-      // const newUser = new User({
-      user = new User({                 // fetching the user from the let variable
+      user = new User({
         name,
         email,
         password: hashedPassword,
       });
 
-      // const savedUser = await newUser.save();
       const savedUser = await user.save();
-
-      // Generate JWT token
       const token = jwt.sign({ id: savedUser._id }, JWT_SECRET!, { expiresIn: "1h" });
+      const { password: _, ...safeUser } = savedUser.toObject();
 
       // Remove OTP from store
       delete otpStore[email];
 
-      // Remove password from response
-      // const safeUser = savedUser.toObject() as any;      // any- This bypasses TypeScript’s strict checking.
-      // // safeUser.password = undefined; // or delete safeUser.password
-      // delete safeUser.password;
-
-      const { password: _, ...safeUser } = savedUser.toObject();
-
-
       return res.status(201).json({
         success: true,
         token,
-        // user: savedUser
         user: safeUser
       });
     }
 
-  } catch (error: any | string) {
+  } catch (error: any) {
     return res.status(500).json({
       success: false,
-      message: "Signup/Login failed.", error: error.message
+      message: "Signup/Login failed.", 
+      error: error.message
     });
   }
 };
