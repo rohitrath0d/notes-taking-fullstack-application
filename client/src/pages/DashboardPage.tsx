@@ -169,7 +169,8 @@ export default function Dashboard() {
   const handleCreateNote = async (data: any) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/create`, {
+      // const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/create`, {
+      const response = await fetch(`${API_BASE_URL}/api/notes/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -199,7 +200,8 @@ export default function Dashboard() {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/update/${isEditing}`, {
+      // const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/update/${isEditing}`, {
+      const response = await fetch(`${API_BASE_URL}/api/notes/update/${isEditing}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -233,7 +235,8 @@ export default function Dashboard() {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/delete/${id}`, {
+      // const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/delete/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/notes/delete/${id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -278,7 +281,8 @@ export default function Dashboard() {
 
   const connectGoogle = () => {
     // Redirect to Google OAuth endpoint
-    window.location.href = `${import.meta.env.VITE_API_URL}/api/googleauth/google`;
+    // window.location.href = `${import.meta.env.VITE_API_URL}/api/googleauth/google`;
+    window.location.href = `${API_BASE_URL}/api/googleauth/google`;
   };
 
   return (
