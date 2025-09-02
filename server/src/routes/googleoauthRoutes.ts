@@ -39,7 +39,8 @@ router.get(
 
     // res.redirect("http://localhost:5173/dashboard");
     // Redirect to frontend with token as query parameter
-    res.redirect(`http://localhost:5173/dashboard?token=${token}`);
+    // res.redirect(`http://localhost:5173/dashboard?token=${token}`);
+    res.redirect(`${process.env.VITE_CLIENT_URL}/dashboard?token=${token}`);
   }
 );
 
