@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 // import SignupPage from "./pages/SignUpPage";
 // import LoginPage from "./pages/UnifiedLoginAndSignInPage";
 import UnifiedLoginAndSignInPage from "./pages/UnifiedLoginAndSignInPage";
-
+import DashboardPage from "./pages/DashboardPage";
 
 function App() {
 
@@ -22,7 +22,7 @@ function App() {
           {/* <Route path="/login" element={<LoginPage />} /> */}
           <Route path="/" element={<Navigate to="/signup-or-login" />} />
           <Route path="/signup-or-login" element={<UnifiedLoginAndSignInPage />} />
-          {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
+          <Route path="/dashboard" element={<DashboardPage />} />
         </Routes>
       </BrowserRouter>
 
