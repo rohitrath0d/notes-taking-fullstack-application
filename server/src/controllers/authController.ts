@@ -385,3 +385,42 @@ export const completeSignupOrLogin = async (req: Request, res: Response) => {
     });
   }
 };
+
+// Get current user details
+export const getCurrentUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated."
+      });
+    }
+
+    const user = await User.findById(userId).select('-password'); // Exclude password
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      user: {
+        name: user.name,
+        email: user.email,
+        googleId: user.googleId,
+        provider: user.provider
+      }
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch user data.",
+      error: error.message
+    });
+  }
+};

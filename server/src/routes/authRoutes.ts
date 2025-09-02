@@ -1,7 +1,8 @@
 import express from "express";
-import { completeSignupOrLogin, requestOtp, verifyOtp } from "../controllers/authController.js";
+import { completeSignupOrLogin, getCurrentUser, requestOtp, verifyOtp } from "../controllers/authController.js";
 // import { signup, login } from "../controllers/authController.js";
 import { otpLimiter, loginLimiter } from "../services/rate-limiter.js";
+import { authenticate } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -11,6 +12,7 @@ const router = express.Router();
 router.post("/request-otp", otpLimiter, requestOtp);
 router.post("/verify-otp", loginLimiter, verifyOtp);
 router.post("/unified-signup-or-login",  loginLimiter, completeSignupOrLogin ) 
+router.get("/me", authenticate, getCurrentUser);
 
 
 export default router;
