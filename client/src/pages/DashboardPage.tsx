@@ -41,25 +41,45 @@ export default function Dashboard() {
       navigate("/");
       return;
     }
-    
+
     // Fetch user data from token (in a real app, you'd decode JWT or call an API)
-    const fetchUserFromToken = async () => {
+    // const fetchUserFromToken = async () => {
+    const fetchUserData = async () => {
       try {
         // In a real app, you might decode the JWT or call a /me endpoint
         // For demo, we'll simulate getting user data
-        const userData = {
-          name: "Jonas Kahnwald",
-          email: "jonas@example.com", // Real email
-          provider: "local"
-        };
-        setUser(userData);
+        // const userData = {
+        //   name: "Jonas Kahnwald",
+        //   email: "jonas@example.com", // Real email
+        //   provider: "local"
+        // };
+        // setUser(userData);
+
+        const token = localStorage.getItem("token");
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user);
+        } else if (response.status === 401) {
+          localStorage.removeItem("token");
+          toast.error("Session expired. Please login again.");
+          navigate("/login");
+        } else {
+          throw new Error("Failed to fetch user data");
+        }
+
       } catch (error) {
         console.error("Failed to fetch user data:", error);
         toast.error("Failed to load user data");
       }
     };
-    
-    fetchUserFromToken();
+
+    // fetchUserFromToken();
+    fetchUserData();
     fetchNotes();
   }, [navigate]);
 
@@ -122,7 +142,7 @@ export default function Dashboard() {
 
   const handleUpdateNote = async (data: any) => {
     if (!isEditing) return;
-    
+
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/update/${isEditing}`, {
@@ -140,7 +160,7 @@ export default function Dashboard() {
         reset();
         setIsEditing(null);
         // Update the note in the list
-        setNotes(prevNotes => 
+        setNotes(prevNotes =>
           prevNotes.map(note => note._id === isEditing ? updatedNote.note : note)
         );
       } else {
@@ -156,7 +176,7 @@ export default function Dashboard() {
     if (!window.confirm("Are you sure you want to delete this note? This action cannot be undone.")) {
       return;
     }
-    
+
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/notes/delete/${id}`, {
@@ -214,9 +234,9 @@ export default function Dashboard() {
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="fixed inset-0 bg-black bg-opacity-25" onClick={() => setIsSidebarOpen(false)}></div>
           <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-xl transform transition-transform duration-300 ease-in-out">
-            <SidebarContent 
-              user={user} 
-              onClose={() => setIsSidebarOpen(false)} 
+            <SidebarContent
+              user={user}
+              onClose={() => setIsSidebarOpen(false)}
               onLogout={handleLogout}
               onConnectGoogle={connectGoogle}
             />
@@ -226,8 +246,8 @@ export default function Dashboard() {
 
       {/* Desktop Sidebar */}
       <div className={`hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 transition-all duration-300 ${isSidebarOpen ? 'lg:w-64' : 'lg:w-20'}`}>
-        <SidebarContent 
-          user={user} 
+        <SidebarContent
+          user={user}
           isCollapsed={!isSidebarOpen}
           onLogout={handleLogout}
           onConnectGoogle={connectGoogle}
@@ -260,10 +280,10 @@ export default function Dashboard() {
                   <div className="bg-white rounded-xl shadow-sm p-4 h-full">
                     <div className=" mt-10 h-90">
                       <NotesAnimation
-                        // autoplay
-                        // loop
-                        // src="https://assets1.lottiefiles.com/packages/lf20_vyL7GL.json"
-                        // style={{ height: '100%', width: '100%' }}
+                      // autoplay
+                      // loop
+                      // src="https://assets1.lottiefiles.com/packages/lf20_vyL7GL.json"
+                      // style={{ height: '100%', width: '100%' }}
                       />
                     </div>
                     <div className="mt-40 text-center">
@@ -347,7 +367,7 @@ export default function Dashboard() {
                       className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 relative group"
                       title="Create new note"
                     >
-                      <Plus 
+                      <Plus
                       // className="h-5 w-5" 
                       />
                       <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-red-600 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">
@@ -355,7 +375,7 @@ export default function Dashboard() {
                       </span>
                     </button>
                   </div>
-                  
+
                   {loading ? (
                     <div className="text-center py-8">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
@@ -413,8 +433,8 @@ export default function Dashboard() {
 }
 
 // Sidebar Component
-function SidebarContent({ user, isCollapsed, onClose, onLogout, onConnectGoogle, onToggle }: { 
-  user: UserData | null; 
+function SidebarContent({ user, isCollapsed, onClose, onLogout, onConnectGoogle, onToggle }: {
+  user: UserData | null;
   isCollapsed?: boolean;
   onClose?: () => void;
   onLogout: () => void;
@@ -428,7 +448,7 @@ function SidebarContent({ user, isCollapsed, onClose, onLogout, onConnectGoogle,
         {!isCollapsed && <h1 className="text-xl font-bold text-blue-600">Dashboard</h1>}
         <div className="flex items-center">
           {onToggle && (
-            <button 
+            <button
               onClick={onToggle}
               className="p-1 rounded hover:bg-gray-100 text-gray-600"
             >
@@ -505,10 +525,10 @@ function SidebarContent({ user, isCollapsed, onClose, onLogout, onConnectGoogle,
       <div className="p-4 border-t border-gray-200">
         <button
           onClick={onLogout}
-          className={`flex items-center gap-2 w-full p-2 text-gray-600 hover:bg-gray-100 rounded ${isCollapsed ? 'justify-center' : ''}`}
+          className={`flex items-center gap-2 w-full rounded-md p-2 text-white bg-blue-600 rounded ${isCollapsed ? 'justify-center' : ''}`}
         >
-          <LogOut 
-          className="h-4 w-4" 
+          <LogOut
+            className="h-4 w-4"
           />
           {!isCollapsed && <span>Logout</span>}
         </button>
