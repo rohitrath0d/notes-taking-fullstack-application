@@ -160,7 +160,8 @@ router.get(
 // Add this endpoint to check auth and return token
 router.get("/check", async (req, res) => {
   try {
-    const token = req.cookies.auth_token;
+    // const token = req.cookies.auth_token;
+    const token = req.cookies.token;
 
     if (!token) {
       return res.status(401).json({ error: "No authentication token found" });
