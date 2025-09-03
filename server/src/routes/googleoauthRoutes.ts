@@ -51,10 +51,10 @@ router.get(
       // Option 2: Send as secure HTTP-only cookie
       res.cookie("token", token, {
         httpOnly: true,                                          // The problem is that Google OAuth flow is setting the token as an HTTP-only cookie instead of returning it in a way that the frontend can access and store in localStorage. HTTP-only cookies are not accessible by JavaScript for security reasons.
-        secure: process.env.NODE_ENV === "production",
+        secure: process.env.NODE_ENV === "production",      // true in prod
         // sameSite: "strict",
-        sameSite: "lax",  // User agents should send the cookie for same-site requests and cross-site top level navigations
-        maxAge: 7200000, // 1h
+        // sameSite: "lax",  // User agents should send the cookie for same-site requests and cross-site top level navigations - GET requests (e.g., clicking a link), but NOT for fetch/XHR/POST. Works for login redirects (Google OAuth redirect). Still won’t send cookies for most API requests between Netlify ↔ Render.
+        sameSite: "none",   //  Required if frontend and backend are on different domains (Netlify ↔ Render). Must also set Secure: true (only works over HTTPS).
         path: "/"
       });
 
