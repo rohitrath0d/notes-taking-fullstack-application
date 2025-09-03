@@ -26,7 +26,7 @@ router.get(
     {
       scope: ["profile", "email"],
       session: false,
-      failureRedirect: "/auth/error"
+      // failureRedirect: "/auth/error"
 
     }),
   async (req, res) => {
@@ -55,7 +55,7 @@ router.get(
         // sameSite: "strict",
         // sameSite: "lax",  // User agents should send the cookie for same-site requests and cross-site top level navigations - GET requests (e.g., clicking a link), but NOT for fetch/XHR/POST. Works for login redirects (Google OAuth redirect). Still won’t send cookies for most API requests between Netlify ↔ Render.
         sameSite: "none",   //  Required if frontend and backend are on different domains (Netlify ↔ Render). Must also set Secure: true (only works over HTTPS).
-        path: "/"
+        // path: "/"
       });
 
       // res.redirect("http://localhost:5173/dashboard");
@@ -80,8 +80,7 @@ router.get(
     } catch (error) {
       console.error("Google OAuth callback error:", error);
       // res.redirect(`${process.env.VITE_CLIENT_URL}/?error=auth_failed`);
-      res.redirect("/auth/error");
-
+      // res.redirect("/auth/error");
     }
   }
 );
@@ -196,9 +195,11 @@ router.get("/check", async (req, res) => {
 
 // Add logout endpoint to clear cookie
 router.post("/logout", (_req, res) => {
-  res.clearCookie("auth_token", {
-    path: "/",
+  // res.clearCookie("auth_token", {
+  res.clearCookie("token", {
+    // path: "/",
     httpOnly: true,
+    sameSite: "none",
     secure: process.env.NODE_ENV === "production"
   });
   return res.json({ success: true, message: "Logged out successfully" });
