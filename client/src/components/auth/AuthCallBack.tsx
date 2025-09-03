@@ -17,10 +17,10 @@ export default function AuthCallback() {
           method: "GET",
           // Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
 
-          headers: {
-            // "Authorization": `Bearer ${token}`,
-            "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
-          },
+          // headers: {
+          //   // "Authorization": `Bearer ${token}`,
+          //   "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+          // },
 
           credentials: 'include' // Important for sending cookies
         });
