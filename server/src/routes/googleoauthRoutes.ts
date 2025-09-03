@@ -22,9 +22,11 @@ router.get("/google", passport.authenticate("google",
 
 router.get(
   "/google/callback",
-  passport.authenticate("google", 
-    { session: false,
-      failureRedirect: "/auth/error"  
+  passport.authenticate("google",
+    {
+      scope: ["profile", "email"],
+      session: false,
+      failureRedirect: "/auth/error"
 
     }),
   async (req, res) => {
@@ -160,17 +162,17 @@ router.get(
 router.get("/check", async (req, res) => {
   try {
     const token = req.cookies.auth_token;
-    
+
     if (!token) {
       return res.status(401).json({ error: "No authentication token found" });
     }
 
     // Verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string } ;
-    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+
     // Optionally get user data from database
     const user = await User.findById(decoded.id);
-    
+
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
