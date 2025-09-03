@@ -55,7 +55,7 @@ router.get(
         // sameSite: "strict",
         // sameSite: "lax",  // User agents should send the cookie for same-site requests and cross-site top level navigations - GET requests (e.g., clicking a link), but NOT for fetch/XHR/POST. Works for login redirects (Google OAuth redirect). Still won’t send cookies for most API requests between Netlify ↔ Render.
         sameSite: "none",   //  Required if frontend and backend are on different domains (Netlify ↔ Render). Must also set Secure: true (only works over HTTPS).
-        // path: "/"
+        // path: "/api/auth/check"
       });
 
       // res.redirect("http://localhost:5173/dashboard");

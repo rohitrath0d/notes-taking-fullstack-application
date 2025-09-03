@@ -4,8 +4,8 @@ import User from "../models/userModel.js";
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    // callbackURL: "/api/googleauth/google/callback",
-    callbackURL: `${process.env.VITE_API_URL}/api/googleauth/google/callback}`,
+    callbackURL: "/api/googleauth/google/callback",
+    // callbackURL: `${process.env.VITE_API_URL}/api/googleauth/google/callback}`,
 }, async (_accessToken, _refreshToken, profile, done) => {
     try {
         // let user = await User.findOne({
