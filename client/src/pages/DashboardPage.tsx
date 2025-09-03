@@ -99,7 +99,7 @@ export default function Dashboard() {
       if (!token) {
         // Check if we have a cookie-based auth
         try {
-          const response = await fetch(`${API_BASE_URL}/api/auth/check`, {
+          const response = await fetch(`${API_BASE_URL}/api/googleauth/check`, {
             credentials: 'include'
           });
 

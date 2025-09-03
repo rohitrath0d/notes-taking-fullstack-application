@@ -13,7 +13,7 @@ export default function AuthCallback() {
   useEffect(() => {
     const checkAuthCookie = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/auth/check`, {
+        const response = await fetch(`${API_BASE_URL}/api/googleauth/check`, {
           credentials: 'include' // Important for sending cookies
         });
 
