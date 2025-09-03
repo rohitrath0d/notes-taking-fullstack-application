@@ -7,6 +7,7 @@ import passport from "passport";
 import "./services/google-oauth.js"; // the strategy to be imported before routes to work properly
 import googleoauthRoutes from "./routes/googleoauthRoutes.js";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 dotenv.config();
 const app = express();
 // Middleware
@@ -24,6 +25,7 @@ const corsOptions = {
 //   credentials: true,                // allow cookies / auth headers
 // }));
 app.use(cors(corsOptions));
+app.use(cookieParser());
 // db connection
 connectDB();
 // Initialize passport middleware

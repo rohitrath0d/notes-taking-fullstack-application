@@ -84,62 +84,96 @@ export default function Dashboard() {
 
   // Check authentication and fetch user data
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      toast.error("Please login to access dashboard");
-      // navigate("/login");
-      navigate("/");
-      return;
-    }
 
-    // Extract user data from token first (faster, no API call needed)
-    const userDataFromToken = getUserFromToken(token);
-    if (userDataFromToken) {
-      setUser(userDataFromToken);
-    }
+    // const token = localStorage.getItem("token");
+    // if (!token) {
+    //   toast.error("Please login to access dashboard");
+    //   // navigate("/login");
+    //   navigate("/");
+    //   return;
+    // }
 
+    const checkAuth = async () => {
+      const token = localStorage.getItem("token");
 
-    // Then fetch detailed user data from API
-    // Fetch user data from token (in a real app, you'd decode JWT or call an API)
-    // const fetchUserFromToken = async () => {
-    const fetchUserData = async () => {
-      try {
-        // In a real app, you might decode the JWT or call a /me endpoint
-        // For demo, we'll simulate getting user data
-        // const userData = {
-        //   name: "Jonas Kahnwald",
-        //   email: "jonas@example.com", // Real email
-        //   provider: "local"
-        // };
-        // setUser(userData);
+      if (!token) {
+        // Check if we have a cookie-based auth
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/auth/check`, {
+            credentials: 'include'
+          });
 
-        const token = localStorage.getItem("token");
-        // const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
-        const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-          },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data.user);
-        } else if (response.status === 401) {
-          localStorage.removeItem("token");
-          toast.error("Session expired. Please login again.");
-          navigate("/");
-        } else {
-          throw new Error("Failed to fetch user data");
+          if (response.ok) {
+            const data = await response.json();
+            if (data.token) {
+              localStorage.setItem("token", data.token);
+              if (data.user) {
+                setUser(data.user);
+              }
+              fetchNotes();
+              return;
+            }
+          }
+        } catch (error) {
+          console.error("Auth check failed:", error);
         }
 
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-        toast.error("Failed to load user data");
+        toast.error("Please login to access dashboard");
+        navigate("/");
+        return;
       }
-    };
 
-    // fetchUserFromToken();
-    fetchUserData();
-    fetchNotes();
+      // Extract user data from token first (faster, no API call needed)
+      const userDataFromToken = getUserFromToken(token);
+      if (userDataFromToken) {
+        setUser(userDataFromToken);
+      }
+
+
+      // Then fetch detailed user data from API
+      // Fetch user data from token (in a real app, you'd decode JWT or call an API)
+      // const fetchUserFromToken = async () => {
+      const fetchUserData = async () => {
+        try {
+          // In a real app, you might decode the JWT or call a /me endpoint
+          // For demo, we'll simulate getting user data
+          // const userData = {
+          //   name: "Jonas Kahnwald",
+          //   email: "jonas@example.com", // Real email
+          //   provider: "local"
+          // };
+          // setUser(userData);
+
+          const token = localStorage.getItem("token");
+          // const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/me`, {
+          const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              credentials: 'include'                    
+            },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setUser(data.user);
+          } else if (response.status === 401) {
+            localStorage.removeItem("token");
+            toast.error("Session expired. Please login again.");
+            navigate("/");
+          } else {
+            throw new Error("Failed to fetch user data");
+          }
+
+        } catch (error) {
+          console.error("Failed to fetch user data:", error);
+          toast.error("Failed to load user data");
+        }
+      };
+
+      // fetchUserFromToken();
+      fetchUserData();
+      fetchNotes();
+    };
+    checkAuth();
   }, [navigate]);
 
   const fetchNotes = async () => {
@@ -150,6 +184,7 @@ export default function Dashboard() {
       const response = await fetch(`${API_BASE_URL}/api/notes/get`, {
         headers: {
           "Authorization": `Bearer ${token}`,
+          credentials: 'include'                    // Adding this line for API calls that require authentication, make sure to include credentials
         },
       });
 
@@ -181,6 +216,7 @@ export default function Dashboard() {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
+          credentials: 'include'
         },
         body: JSON.stringify(data),
       });
@@ -212,6 +248,7 @@ export default function Dashboard() {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
+          credentials: 'include'
         },
         body: JSON.stringify(data),
       });
@@ -246,6 +283,7 @@ export default function Dashboard() {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
+          credentials: 'include'
         },
       });
 
@@ -278,11 +316,29 @@ export default function Dashboard() {
     reset();
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    toast.success("Logged out successfully");
-    // navigate("/login");
-    navigate("/");
+  // const handleLogout = () => {
+  //   localStorage.removeItem("token");
+  //   toast.success("Logged out successfully");
+  //   // navigate("/login");
+  //   navigate("/");
+  // };
+
+  const handleLogout = async () => {
+    try {
+      // Call backend logout to clear cookie
+      await fetch(`${API_BASE_URL}/api/auth/logout`, {
+        method: "POST",
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // Clear frontend storage
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      toast.success("Logged out successfully");
+      navigate("/");
+    }
   };
 
   const connectGoogle = () => {

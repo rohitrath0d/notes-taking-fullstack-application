@@ -2,6 +2,7 @@ import express from "express";
 import passport from "passport";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import User from "../models/userModel.js";
 // import TemporaryCode from "../models/TemporaryCode.js";
 // import User from "../models/userModel.js";
 // import crypto from "crypto";
@@ -21,7 +22,11 @@ router.get("/google", passport.authenticate("google",
 
 router.get(
   "/google/callback",
-  passport.authenticate("google", { session: false }),
+  passport.authenticate("google", 
+    { session: false,
+      failureRedirect: "/auth/error"  
+
+    }),
   async (req, res) => {
     try {
       const user = req.user as any;
@@ -45,7 +50,8 @@ router.get(
       res.cookie("token", token, {
         httpOnly: true,                                          // The problem is that Google OAuth flow is setting the token as an HTTP-only cookie instead of returning it in a way that the frontend can access and store in localStorage. HTTP-only cookies are not accessible by JavaScript for security reasons.
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        // sameSite: "strict",
+        sameSite: "lax",  // User agents should send the cookie for same-site requests and cross-site top level navigations
         maxAge: 7200000, // 1h
         path: "/"
       });
@@ -66,7 +72,8 @@ router.get(
 
       // res.redirect(`${process.env.VITE_CLIENT_URL}/dashboard?token=${token}`);
       // res.redirect(`${process.env.VITE_CLIENT_URL}/auth/callback?code=${tempCode}&type=google`);
-      res.redirect(`${process.env.VITE_CLIENT_URL}/dashboard`)
+      // res.redirect(`${process.env.VITE_CLIENT_URL}/dashboard`)
+      res.redirect(`${process.env.VITE_CLIENT_URL}/auth/callback`)
 
     } catch (error) {
       console.error("Google OAuth callback error:", error);
@@ -148,6 +155,52 @@ router.get(
 //   }
 // });
 
+
+// Add this endpoint to check auth and return token
+router.get("/check", async (req, res) => {
+  try {
+    const token = req.cookies.auth_token;
+    
+    if (!token) {
+      return res.status(401).json({ error: "No authentication token found" });
+    }
+
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string } ;
+    
+    // Optionally get user data from database
+    const user = await User.findById(decoded.id);
+    
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Return token to be stored in localStorage
+    return res.json({
+      success: true,
+      token,
+      user: {
+        name: user.name,
+        email: user.email,
+        googleId: user.googleId,
+        provider: user.provider
+      }
+    });
+  } catch (error) {
+    console.error("Auth check error:", error);
+    return res.status(401).json({ error: "Invalid token" });
+  }
+});
+
+// Add logout endpoint to clear cookie
+router.post("/logout", (_req, res) => {
+  return res.clearCookie("auth_token", {
+    path: "/",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production"
+  });
+  return res.json({ success: true, message: "Logged out successfully" });
+});
 
 
 export default router;
