@@ -169,7 +169,8 @@ export default function UnifiedLoginAndSignInPage() {
             type="button"
             variant="outline"
             className="mb-4 w-full flex items-center justify-center gap-2 py-5 border-gray-300 hover:bg-gray-50 transition-colors"
-            onClick={() => (window.location.href = `${API_BASE_URL}/api/googleauth/google`)}
+            // onClick={() => (window.location.href = `${API_BASE_URL}/api/googleauth/google`)}
+            onClick={() => (window.location.href = `${API_BASE_URL}/api/googleauth/google/callback`)}
           >
             <FcGoogle className="h-5 w-5" />
             Continue with Google
