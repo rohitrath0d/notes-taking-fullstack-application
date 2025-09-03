@@ -160,8 +160,8 @@ router.get(
 // Add this endpoint to check auth and return token
 router.get("/check", async (req, res) => {
   try {
-    // const token = req.cookies.auth_token;
-    const token = req.cookies.token;
+    const token = req.cookies.auth_token;
+    // const token = req.cookies.token;
 
     if (!token) {
       return res.status(401).json({ error: "No authentication token found" });
@@ -196,8 +196,8 @@ router.get("/check", async (req, res) => {
 
 // Add logout endpoint to clear cookie
 router.post("/logout", (_req, res) => {
-  // res.clearCookie("auth_token", {
-  res.clearCookie("token", {
+  res.clearCookie("auth_token", {
+  // res.clearCookie("token", {
     // path: "/",
     httpOnly: true,
     sameSite: "none",
