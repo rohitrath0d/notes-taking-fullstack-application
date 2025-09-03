@@ -194,7 +194,7 @@ router.get("/check", async (req, res) => {
 
 // Add logout endpoint to clear cookie
 router.post("/logout", (_req, res) => {
-  return res.clearCookie("auth_token", {
+  res.clearCookie("auth_token", {
     path: "/",
     httpOnly: true,
     secure: process.env.NODE_ENV === "production"

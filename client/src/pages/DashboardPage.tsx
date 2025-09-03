@@ -149,8 +149,8 @@ export default function Dashboard() {
           const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
             headers: {
               "Authorization": `Bearer ${token}`,
-              credentials: 'include'                    
             },
+            credentials: 'include'
           });
           if (response.ok) {
             const data = await response.json();
@@ -184,8 +184,8 @@ export default function Dashboard() {
       const response = await fetch(`${API_BASE_URL}/api/notes/get`, {
         headers: {
           "Authorization": `Bearer ${token}`,
-          credentials: 'include'                    // Adding this line for API calls that require authentication, make sure to include credentials
         },
+        credentials: 'include'                    // Adding this line for API calls that require authentication, make sure to include credentials
       });
 
       if (response.ok) {
@@ -216,8 +216,8 @@ export default function Dashboard() {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
-          credentials: 'include'
         },
+        credentials: 'include',
         body: JSON.stringify(data),
       });
 
@@ -248,8 +248,8 @@ export default function Dashboard() {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,
-          credentials: 'include'
         },
+        credentials: 'include',
         body: JSON.stringify(data),
       });
 
@@ -283,8 +283,8 @@ export default function Dashboard() {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
-          credentials: 'include'
         },
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -326,9 +326,8 @@ export default function Dashboard() {
   const handleLogout = async () => {
     try {
       // Call backend logout to clear cookie
-      await fetch(`${API_BASE_URL}/api/auth/logout`, {
+      await fetch(`${API_BASE_URL}/api/googleauth/logout`, {
         method: "POST",
-        credentials: 'include'
       });
     } catch (error) {
       console.error("Logout error:", error);
@@ -344,7 +343,7 @@ export default function Dashboard() {
   const connectGoogle = () => {
     // Redirect to Google OAuth endpoint
     // window.location.href = `${import.meta.env.VITE_API_URL}/api/googleauth/google`;
-    window.location.href = `${API_BASE_URL}/api/googleauth/google`;
+    window.location.href = `${API_BASE_URL}/api/googleauth/google/callback`;
   };
 
   return (
