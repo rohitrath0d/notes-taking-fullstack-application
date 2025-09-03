@@ -7,8 +7,9 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      callbackURL: "/api/googleauth/google/callback",
+      // callbackURL: "/api/googleauth/google/callback",
       // callbackURL: `${process.env.VITE_API_URL}/api/googleauth/google/callback}`,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL!,      // full absolute URL
     },
     async (_accessToken, _refreshToken, profile, done) => {
       try {
@@ -46,7 +47,7 @@ passport.use(
             provider: "google",
           });
         }
-        
+
         done(null, user);
       } catch (error: string | any) {
         // done(error, null);
