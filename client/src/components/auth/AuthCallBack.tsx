@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { API_BASE_URL } from "../../lib/api";
 
 export default function AuthCallBack() {
   const [searchParams] = useSearchParams();
@@ -20,7 +21,8 @@ export default function AuthCallBack() {
           throw new Error("Invalid callback parameters");
         }
         
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/googleauth/exchange-code`, {
+        // const response = await fetch(`${import.meta.env.VITE_API_URL}/api/googleauth/exchange-code`, {
+        const response = await fetch(`${API_BASE_URL}/api/googleauth/exchange-code`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
