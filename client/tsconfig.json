@@ -14,8 +14,8 @@
       "@/*": [
         "src/*"
       ],
-      "noUnusedLocals": false,
-      "noUnusedParameters": false
-    }
+    },
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   }
 }
