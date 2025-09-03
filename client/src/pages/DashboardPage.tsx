@@ -343,7 +343,7 @@ export default function Dashboard() {
   const connectGoogle = () => {
     // Redirect to Google OAuth endpoint
     // window.location.href = `${import.meta.env.VITE_API_URL}/api/googleauth/google`;
-    window.location.href = `${API_BASE_URL}/api/googleauth/google/callback`;
+    window.location.href = `${API_BASE_URL}/api/googleauth/google/`;
   };
 
   return (
