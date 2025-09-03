@@ -14,21 +14,29 @@ export default function AuthCallback() {
     const checkAuthCookie = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/api/googleauth/check`, {
+          method: "GET",
+          // Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+
+          headers: {
+            // "Authorization": `Bearer ${token}`,
+            "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+          },
+
           credentials: 'include' // Important for sending cookies
         });
 
         if (response.ok) {
           const data = await response.json();
-          
+
           if (data.token) {
             // Move token from cookie to localStorage for API requests
             localStorage.setItem("token", data.token);
-            
+
             // Store user data if needed
             if (data.user) {
               localStorage.setItem("user", JSON.stringify(data.user));
             }
-            
+
             toast.success("Login successful!");
             navigate("/dashboard");
           } else {

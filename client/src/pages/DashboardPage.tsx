@@ -100,6 +100,10 @@ export default function Dashboard() {
         // Check if we have a cookie-based auth
         try {
           const response = await fetch(`${API_BASE_URL}/api/googleauth/check`, {
+            method: "GET",
+            headers: {
+              "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+            },
             credentials: 'include'
           });
 
