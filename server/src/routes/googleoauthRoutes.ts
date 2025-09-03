@@ -66,7 +66,7 @@ router.get(
 
       // res.redirect(`${process.env.VITE_CLIENT_URL}/dashboard?token=${token}`);
       // res.redirect(`${process.env.VITE_CLIENT_URL}/auth/callback?code=${tempCode}&type=google`);
-      res.redirect(`${process.env.VITE_CLIENT_URL}`)
+      res.redirect(`${process.env.VITE_CLIENT_URL}/dashboard`)
 
     } catch (error) {
       console.error("Google OAuth callback error:", error);
