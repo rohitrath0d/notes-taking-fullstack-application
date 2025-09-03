@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Plus, Edit, Trash2, Menu, X, User,
+import {
+  Plus, Edit, Trash2, Menu, X, User,
   //  Mail,
-    LogOut, ChevronLeft, ChevronRight } from "lucide-react";
+  LogOut, ChevronLeft, ChevronRight
+} from "lucide-react";
 import { toast } from "sonner";
 import NotesAnimation from "../components/animations/NotesAnimation";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -73,6 +75,9 @@ export default function Dashboard() {
       window.history.replaceState({}, document.title, cleanUrl);
 
       toast.success("Successfully logged in!");
+
+      // Refresh the page to load with the new token
+      window.location.reload();
     }
   }, [searchParams]);
 
@@ -546,7 +551,7 @@ function SidebarContent({ user, isCollapsed, onClose, onLogout, onConnectGoogle,
               <span className="text-gray-600">Local Account</span>
               <span className="text-green-500 font-medium">Connected</span>
             </div> */}
-            
+
             {/* Show local account status only if user has local account */}
             {(user.provider === 'local' || user.provider === 'both') && (
               <div className="flex items-center justify-between text-sm mb-2">

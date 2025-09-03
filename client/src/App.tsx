@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 // import LoginPage from "./pages/UnifiedLoginAndSignInPage";
 import UnifiedLoginAndSignInPage from "./pages/UnifiedLoginAndSignInPage";
 import DashboardPage from "./pages/DashboardPage";
+import AuthCallBack from "./components/auth/AuthCallBack";
 
 function App() {
 
@@ -23,6 +24,8 @@ function App() {
           <Route path="/" element={<Navigate to="/signup-or-login" />} />
           <Route path="/signup-or-login" element={<UnifiedLoginAndSignInPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/auth/callback" element={<AuthCallBack />} />
+
         </Routes>
       </BrowserRouter>
 

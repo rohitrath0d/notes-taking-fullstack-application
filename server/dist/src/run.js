@@ -14,7 +14,7 @@ app.use(express.json());
 // enable cors & corsOptions
 const corsOptions = {
     // origin:'http://localhost:8080',       // --> this request should be coming from frontend
-    origin: process.env.VITE_cLIENT_URL,
+    origin: process.env.VITE_CLIENT_URL,
     credentials: true, // as we are using cookie, credentials will be true.
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
