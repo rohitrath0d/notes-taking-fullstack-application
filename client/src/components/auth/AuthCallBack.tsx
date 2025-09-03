@@ -20,7 +20,7 @@ export default function AuthCallBack() {
           throw new Error("Invalid callback parameters");
         }
         
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/exchange-code`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/googleauth/exchange-code`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
