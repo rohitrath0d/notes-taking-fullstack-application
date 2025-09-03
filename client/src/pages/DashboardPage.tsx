@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Plus, Edit, Trash2, Menu, X, User, Mail, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Edit, Trash2, Menu, X, User,
+  //  Mail,
+    LogOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import NotesAnimation from "../components/animations/NotesAnimation";
 import { useNavigate, useSearchParams } from "react-router-dom";

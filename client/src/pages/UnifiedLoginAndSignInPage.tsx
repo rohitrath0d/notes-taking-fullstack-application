@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import * as z from "zod";
 import { Card, CardContent } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
@@ -13,18 +12,18 @@ import LoginAnimation from "../components/animations/LoginAnimation";
 import { API_BASE_URL } from "../lib/api";
 
 // Create different schemas for different steps
-const emailSchema = z.object({
-  email: z.string().email("Invalid email"),
-});
+// const emailSchema = z.object({
+//   email: z.string().email("Invalid email"),
+// });
 
-const otpSchema = z.object({
-  otp: z.string().length(6, "OTP must be 6 digits"),
-});
+// const otpSchema = z.object({
+//   otp: z.string().length(6, "OTP must be 6 digits"),
+// });
 
-const passwordSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
+// const passwordSchema = z.object({
+//   name: z.string().min(1, "Name is required"),
+//   password: z.string().min(6, "Password must be at least 6 characters"),
+// });
 
 type LoginForm = {
   email: string;
